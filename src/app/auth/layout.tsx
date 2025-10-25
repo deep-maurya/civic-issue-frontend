@@ -16,11 +16,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="grid min-h-svh lg:grid-cols-6">
       <div className="bg-muted relative hidden lg:block col-span-4">
         <Image
-          src="/placeholder.jpeg"
+          src="/bg.jpg"
           alt="Image"
-          width={100}
-          height={100}
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          width={1600}
+          height={900}
+          className="absolute inset-0 h-full w-full "
         />
       </div>
       <div className="flex flex-col gap-4 p-6 md:p-10 lg:col-span-2">
