@@ -358,7 +358,7 @@ const CivicIssueLanding = () => {
         </div>
 
         {/* Map */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+        <div className="max-w-7xl mx-auto mb-10">
           <IssuesMap issues={civicIssues} theme={themeContext?.theme} />
         </div>
 
