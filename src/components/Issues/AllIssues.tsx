@@ -26,7 +26,6 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
-import IssueSheet from "./IssueSheet";
 
 interface User {
   _id: string;
@@ -207,7 +206,7 @@ export default function AllIssues() {
               {/* Who created */}
               <div className="flex items-center mb-3 space-x-2">
                 <img
-                  src={issue?.reportedBy?.avatar || "/avatar.jpeg"}
+                  src={"/avatar.jpeg"}
                   alt={issue?.reportedBy?.name}
                   className="w-6 h-6 rounded-full"
                 />
@@ -226,13 +225,13 @@ export default function AllIssues() {
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                 <button
                   className={`flex items-center space-x-1 px-2 py-1 rounded-md border ${
-                    issue.upvotedByCurrentUser
+                    true
                       ? "bg-primary text-white border-primary"
                       : "border-border/50 text-primary hover:bg-primary/10"
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleUpvote(issue._id);
+                    // handleUpvote(issue._id);
                   }}
                 >
                   <ThumbsUp className="w-4 h-4" />
