@@ -34,6 +34,4 @@ export type registrationRequest = {
 
 export type RegistrationResponse = ApiResponse<{
   user: User;
-  token: string;
-  refreshToken: string;
 }>;

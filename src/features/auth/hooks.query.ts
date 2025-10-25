@@ -45,7 +45,7 @@ const useRegistrationMutation = () => {
   return useMutation<RegistrationResponse, any, registrationRequest>({
     mutationFn: async (data) => {
       const res = await authApi.register(data);
-      if (!res.success || !res.data) {
+      if (res.status!=='success' || !res.user) {
         throw res.message || 'Registration failed';
       }
       return res;
