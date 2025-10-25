@@ -29,7 +29,7 @@ const register = async (data: registrationRequest) => {
 
 const logout = async () => {
   try {
-    const response = await api.post('/auth/logout');
+    const response = await api.post('/users/logout');
     return response.data;
   } catch (error) {
     throw error;

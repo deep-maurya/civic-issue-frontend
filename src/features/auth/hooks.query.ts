@@ -25,6 +25,7 @@ const useLoginMutation = () => {
     },
     onSuccess: (res) => {
       if (res.user) {
+        setCredentials(res.user, "USER", true);
         toast.success('Login Successful');
         router.push('/dashboard');
       } else {
