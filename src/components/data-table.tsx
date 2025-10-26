@@ -318,31 +318,7 @@ const createColumns = (refetch: () => void): ColumnDef<z.infer<typeof schema>>[]
         {new Date(row.original.createdAt).toLocaleDateString()}
       </div>
     ),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>View Details</DropdownMenuItem>
-          <DropdownMenuItem>Edit Status</DropdownMenuItem>
-          <DropdownMenuItem>Assign</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
+  }
 ]
 
 const columns: ColumnDef<z.infer<typeof schema>>[] = []
@@ -775,7 +751,7 @@ function TableCellViewer({ item, refetch }: { item: z.infer<typeof schema>, refe
           {item.title}
         </Button>
       </DrawerTrigger>
-      <DrawerContent className={!isMobile ? "w-[800px] ml-auto" : ""}>
+      <DrawerContent className={!isMobile ? "min-w-[600px] ml-auto" : ""}>
         <DrawerHeader className="gap-1">
           <DrawerTitle className="text-2xl">{item.title}</DrawerTitle>
           <DrawerDescription>
@@ -847,25 +823,6 @@ function TableCellViewer({ item, refetch }: { item: z.infer<typeof schema>, refe
                   </Select>
                 </div>
               </div>
-              
-              {/* Images */}
-              {item.images && item.images.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  <Label className="font-semibold text-base">Attached Images ({item.images.length})</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {item.images.map((image, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Issue image ${index + 1}`}
-                          className="rounded-lg border w-full h-32 object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
             
             {/* Right Column - Metadata & Timeline */}
