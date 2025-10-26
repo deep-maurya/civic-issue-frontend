@@ -131,7 +131,7 @@ const { data: issues, isLoading, isFetched, refetch } = useGetAllIssues()
   return (
 <div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {isFetched && issues.map((issue:any) => (
+          {isFetched && (issues?.data as any[]).map((issue)  => (
             <div
               key={issue._id}
               className="bg-background border border-border/50 rounded-xl hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 cursor-pointer"

@@ -13,7 +13,7 @@ export const issueUpvote = async (upvoteIssue: upvoteIssue) => {
 export const getAllIssue = async () => {
     try {
         const response = await api.get<GetAllIssueResponse>('/issues');
-        return response.data.data;
+        return response.data;
     } catch (error) {
         throw error;
     }
@@ -25,8 +25,13 @@ export const reportIssue = async (payload: ReportIssuePayload): Promise<any> => 
     formData.append('title', payload.issueType);
     formData.append('description', payload.description);
     formData.append('location', payload.address);
-    formData.append('longitude', payload.longitude);
-    formData.append('latitude', payload.latitude);
+    if (payload.longitude !== null) {
+      formData.append('longitude', payload.longitude.toString());
+    }
+    
+    if (payload.latitude !== null) {
+      formData.append('latitude', payload.latitude.toString());
+    }
     if (payload.photo) {
       formData.append('images', payload.photo);
     }

@@ -35,8 +35,8 @@ export type ReportIssuePayload = {
   description: string;
   address: string;
   photo?: File | null;
-  latitude: Number,
-  longitude:Number
+  latitude: Number | null,
+  longitude:Number | null
 };
 
 export type ReportIssueResponse = {
