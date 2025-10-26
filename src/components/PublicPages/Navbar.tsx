@@ -59,14 +59,6 @@ const Navbar = () => {
               >
                 How It Works
               </a>
-
-              <a
-                href="#report"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all bg-gradient-to-br from-primary to-primary/70 text-primary-foreground hover:from-primary/90 hover:to-primary/80"
-              >
-                <Zap className="w-4 h-4" />
-                Report Issue
-              </a>
             </div>
 
             {/* Right Controls */}
