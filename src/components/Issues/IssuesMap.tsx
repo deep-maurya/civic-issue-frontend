@@ -9,6 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 import {
   Trash2,
   Lightbulb,
@@ -184,6 +186,15 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, isLoading, theme = 'light
 
   return (
     <div className="w-full relative">
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-slate-900/50">
+          <div className="space-y-4 w-1/3">
+            <Skeleton height={40} width="100%" />
+            <Skeleton height={40} width="80%" />
+            <Skeleton height={40} width="90%" />
+          </div>
+        </div>
+      )}
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={mapCenter}
