@@ -2,11 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import ThemeSwitcher from "../global/ThemeSwitcher";
-import { Menu, X, Zap } from "lucide-react";
+import { Ghost, Menu, X, Zap } from "lucide-react";
 import Link from "next/link";
+import { Button } from "../ui/button";
+import { useAuthSelector } from "@/features/auth/hooks.redux";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isLoggedIn } = useAuthSelector();
+  const router = useRouter();
 
   // Close menu on scroll
   useEffect(() => {
@@ -16,6 +21,11 @@ const Navbar = () => {
       return () => window.removeEventListener("scroll", handleScroll);
     }
   }, [isMenuOpen]);
+
+  const handleNavigation = (path: string) => {
+    setIsMenuOpen(false);
+    router.push(path);
+  };
 
   return (
     <>
@@ -50,7 +60,6 @@ const Navbar = () => {
                 How It Works
               </a>
 
-              {/* Report Issue Button */}
               <a
                 href="#report"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all bg-gradient-to-br from-primary to-primary/70 text-primary-foreground hover:from-primary/90 hover:to-primary/80"
@@ -62,9 +71,40 @@ const Navbar = () => {
 
             {/* Right Controls */}
             <div className="flex items-center space-x-4">
+              <div className="hidden md:flex gap-2">
+                {!isLoggedIn && (
+                  <>
+                    <Button
+                      size="lg"
+                      onClick={() => router.push("/auth/login")}
+                      variant="outline"
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      size="lg"
+                      onClick={() => router.push("/auth/signup")}
+                      variant="default"
+                    >
+                      Register
+                    </Button>
+                  </>
+                )}
+                {isLoggedIn && (
+                  <Button
+                    size="lg"
+                    onClick={() => router.push("/dashboard")}
+                    variant="secondary"
+                  >
+                    Dashboard
+                  </Button>
+                )}
+              </div>
               <ThemeSwitcher />
+
+              {/* Mobile Menu Button */}
               <button
-                className="md:hidden p-2 rounded-lg hover:bg-accent"
+                className="md:hidden p-2 rounded-lg hover:bg-accent transition"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -76,7 +116,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border">
+        <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border animate-slide-down">
           <div className="px-4 py-4 space-y-4">
             <a
               href="#features"
@@ -100,8 +140,32 @@ const Navbar = () => {
               <Zap className="w-4 h-4" />
               Report Issue
             </a>
-            <div className="pt-4 border-t border-border">
-              <ThemeSwitcher />
+
+            <div className="flex flex-col space-y-2 mt-2">
+              {!isLoggedIn ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleNavigation("/auth/login")}
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => handleNavigation("/auth/signup")}
+                  >
+                    Register
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="secondary"
+                  onClick={() => handleNavigation("/dashboard")}
+                >
+                  Dashboard
+                </Button>
+              )}
+              
             </div>
           </div>
         </div>

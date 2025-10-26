@@ -17,7 +17,6 @@ import {
 
 import Navbar from "@/components/PublicPages/Navbar";
 import Footer from "@/components/PublicPages/Footer";
-import ReportIssueModal from "@/components/ReportIssueModal";
 import { Button } from "@/components/ui/button";
 import IssuesMap from "@/components/IssuesMap";
 import { useTheme } from "next-themes";
@@ -25,6 +24,7 @@ import { ThemeContext } from "@/context/ThemeContext";
 import AllIssues from "@/components/Issues/AllIssues";
 import { useAuthSelector } from "@/features/auth/hooks.redux";
 import { useGetAllIssues } from "@/features/issue/hooks.query";
+import ReportIssueModal from "@/components/Issues/ReportIssueModal";
 
 export interface CivicIssue {
   id: number;
