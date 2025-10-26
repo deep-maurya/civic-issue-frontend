@@ -1,5 +1,6 @@
 import api from '@/config/axios.config';
-import { assignIssue, GetAllIssueResponse, ReportIssuePayload, ReportIssueResponse, updateStatus, upvoteIssue, upvoteResponse } from './type';
+import { assignIssue, GetAllIssueResponse, Issue, ReportIssuePayload, ReportIssueResponse, updateStatus, upvoteIssue, upvoteResponse } from './type';
+import { ApiResponse } from '@/types/api.type';
 
 export const issueUpvote = async (upvoteIssue: upvoteIssue) => {
     try {
@@ -17,6 +18,15 @@ export const getAllIssue = async () => {
     } catch (error) {
         throw error;
     }
+}
+
+export const getIssueById = async (issue_id: string) => {
+  try {
+      const response = await api.get<ApiResponse<Issue>>(`/issues/${issue_id}`);
+      return response.data.data;
+  } catch (error) {
+      throw error;
+  }
 }
 
 export const changeStaus = async (update_status: updateStatus) => {

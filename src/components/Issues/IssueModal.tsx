@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import SocialShareGrid from "../common/SocialShareGrid";
 
 interface User {
   _id: string;
@@ -233,6 +234,24 @@ export default function IssueModal({
                         </div>
                       ))}
                     </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 border-t pt-6 mt-6">
+                    <h2 className="text-lg font-semibold text-foreground">
+                      Rally Support for This Issue
+                    </h2>
+
+                    <p className="text-sm text-foreground/70 -mt-2">
+                      Share it with your circle and help bring attention where it’s needed most.
+                    </p>
+                    <SocialShareGrid
+                      platforms={["facebook", "twitter", "linkedin", "whatsapp"]}
+                      meta={{
+                        url: "https://civic-issue-frontend.vercel.app/issues/" + selectedIssue?._id,
+                        title: selectedIssue?.title,
+                      }}
+                      showName={false}
+                    />
                   </div>
                 </TabsContent>
 
