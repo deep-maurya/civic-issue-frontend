@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -27,8 +26,8 @@ import {
   Clock,
 } from "lucide-react";
 import { issueUpvote } from "@/features/issue/api";
-import { useGetAllIssues } from "@/features/issue/hooks.query";
 import { useAuthSelector } from "@/features/auth/hooks.redux";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface User {
   _id: string;
@@ -85,7 +84,6 @@ const getStatusColor = (status: string) => {
 const getStatusIcon = (status: string) => {
   switch (status.toLowerCase()) {
     case "pending":
-      return <Clock className="w-4 h-4" />;
     case "in-progress":
       return <Clock className="w-4 h-4" />;
     case "assigned":
@@ -97,58 +95,56 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-
-
- 
-  
-
-export default function AllIssues(
-    {
-        issues,
-        isLoading,
-        isFetched,
-        refetch
-    }: {
-        issues: any[],
-        isLoading: boolean,
-        isFetched: boolean,
-        refetch: () => Promise<void>
-    }
-) {
+export default function AllIssues({
+  issues,
+  isLoading,
+  isFetched,
+  refetch,
+}: {
+  issues: Issue[];
+  isLoading: boolean;
+  isFetched: boolean;
+  refetch: () => Promise<void>;
+}) {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [upvoting, setIsupvoting] = useState(false);
+  const [upvoting, setIsUpvoting] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { isLoggedIn } = useAuthSelector();
 
   const openModal = (issue: Issue) => {
     setSelectedIssue(issue);
     setIsModalOpen(true);
+    setShowLoginPrompt(false);
   };
 
   const handleUpvote = async (issueId: string) => {
-    setIsupvoting(true);
-    try {
-      const response = await issueUpvote({issue_id:issueId});
-      await refetch().then(()=>{
-        setIsupvoting(false);
-      });
-      return response
-    } catch (error: any) {
-      console.error('Upvote failed', error)
-      throw error
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
     }
-  }
+    setIsUpvoting(true);
+    try {
+      await issueUpvote({ issue_id: issueId });
+      await refetch();
+      setIsUpvoting(false);
+      setShowLoginPrompt(false);
+    } catch (error) {
+      console.error("Upvote failed", error);
+      setIsUpvoting(false);
+    }
+  };
 
   return (
-<div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {isFetched && issues.map((issue)  => (
+    <div>
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {isFetched &&
+          issues.map((issue) => (
             <div
               key={issue._id}
               className="bg-background border border-border/50 rounded-xl hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 cursor-pointer"
               onClick={() => openModal(issue)}
             >
-              {/* Main Image */}
               <div className="w-full h-40 rounded-t-lg overflow-hidden mb-4 bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
                 {issue.images[0] ? (
                   <img
@@ -162,73 +158,71 @@ export default function AllIssues(
               </div>
 
               <div className="px-4 py-2">
-                {/* Title */}
-              <h3 className="text-lg font-semibold mb-1 text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                {issue.title}
-              </h3>
+                <h3 className="text-lg font-semibold mb-1 text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                  {issue.title}
+                </h3>
 
-              {/* Description */}
-              <p className="text-foreground/70 text-sm mb-3 line-clamp-3">
-                {issue.description}
-              </p>
+                <p className="text-foreground/70 text-sm mb-3 line-clamp-3">
+                  {issue.description}
+                </p>
 
-              {/* Who created */}
-              <div className="flex items-center mb-3 space-x-2">
-                <img
-                  src={"/avatar.jpeg"}
-                  alt={issue?.reportedBy?.name}
-                  className="w-6 h-6 rounded-full"
-                />
-                <span className="text-sm text-foreground/80">
-                  {issue?.reportedBy?.name || "Anonymous"}
-                </span>
-              </div>
-
-              {/* Location */}
-              <div className="flex items-center  text-sm text-gray-500 dark:text-gray-400 mb-3">
-                <MapPin className="w-4 h-4 mr-1 text-primary" />
-                <span className="line-clamp-1">{issue.location}</span>
-              </div>
-
-              {/* Upvote Button & Date */}
-              <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-              <Button
-                disabled={upvoting}
-                className={`flex items-center space-x-1 px-2 py-1 rounded-md border cursor-pointer ${
-                    true
-                    ? "bg-primary text-white border-primary"
-                    : "border-border/50 text-primary hover:bg-primary/10"
-                }`}
-                onClick={(e) => {
-                    if(isLoggedIn){
-                        e.stopPropagation()
-                        handleUpvote(issue._id)
-                    } else {
-                        alert("Please login to upvote")
-                    }
-                }}
-                >
-                <ThumbsUp className="w-4 h-4" />
-                <span>{issue.upvotes?.length || 0}</span>
-                </Button>
-
-
-                <div className="flex items-center space-x-1 text-xs">
-                  <Calendar className="w-3 h-3" />
-                  <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                <div className="flex items-center mb-3 space-x-2">
+                  <img
+                    src={"/avatar.jpeg"}
+                    alt={issue?.reportedBy?.name}
+                    className="w-6 h-6 rounded-full"
+                  />
+                  <span className="text-sm text-foreground/80">
+                    {issue?.reportedBy?.name || "Anonymous"}
+                  </span>
                 </div>
-              </div>
+
+                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <MapPin className="w-4 h-4 mr-1 text-primary" />
+                  <span className="line-clamp-1">{issue.location}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                <TooltipProvider>
+  <Tooltip>
+    {/* Tooltip appears only if user is NOT logged in */}
+    <TooltipTrigger asChild>
+      <Button
+        disabled={upvoting}
+        onClick={() => handleUpvote(issue._id)}
+        className={`flex items-center space-x-1 px-2 py-1 rounded-md border ${
+          isLoggedIn
+            ? "bg-primary text-white border-primary"
+            : "bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed"
+        }`}
+      >
+        <ThumbsUp className="w-4 h-4" />
+        <span>{issue.upvotes?.length || 0}</span>
+      </Button>
+    </TooltipTrigger>
+    {!isLoggedIn && (
+      <TooltipContent side="top" className="bg-gray-900 text-white text-xs">
+        Login to upvote
+      </TooltipContent>
+    )}
+  </Tooltip>
+</TooltipProvider>
+
+
+                  <div className="flex items-center space-x-1 text-xs">
+                    <Calendar className="w-3 h-3" />
+                    <span>{new Date(issue.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
-        </div>
-
-     
+      </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="w-[95vw] sm:max-w-[90vw] lg:max-w-[900px] xl:max-w-[900px] lg:h-[500px] h-[90vh] p-0 overflow-hidden flex flex-col">
           <div className="grid grid-cols-1 lg:grid-cols-3 h-full overflow-hidden">
-            {/* Left Side - Content */}
+            {/* Left Side */}
             <div className="lg:col-span-2 p-4 md:p-6 overflow-y-auto">
               <DialogHeader className="mb-4 md:mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -246,9 +240,7 @@ export default function AllIssues(
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
                         {selectedIssue &&
-                          new Date(
-                            selectedIssue.createdAt
-                          ).toLocaleDateString()}
+                          new Date(selectedIssue.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
@@ -262,6 +254,37 @@ export default function AllIssues(
                 </div>
               </DialogHeader>
 
+              {/* Show login prompt if user is not logged in */}
+              {showLoginPrompt && (
+                <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-md mb-4 text-sm flex items-center justify-between">
+                  <span>Please login to upvote this issue.</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowLoginPrompt(false)}
+                  >
+                    ✕
+                  </Button>
+                </div>
+              )}
+
+              {/* Upvote Button inside Modal */}
+              <div className="mb-4">
+                <Button
+                  disabled={upvoting}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md ${
+                    isLoggedIn
+                      ? "bg-primary text-white border-primary"
+                      : "bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed"
+                  }`}
+                  onClick={() => handleUpvote(selectedIssue!._id)}
+                >
+                  <ThumbsUp className="w-4 h-4" />
+                  <span>{selectedIssue?.upvotes?.length || 0} Support</span>
+                </Button>
+              </div>
+
+              {/* Tabs */}
               <Tabs defaultValue="details" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 h-[40px]">
                   <TabsTrigger value="details" className="text-xs sm:text-sm">
@@ -275,10 +298,7 @@ export default function AllIssues(
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent
-                  value="details"
-                  className="space-y-4 md:space-y-6 pb-6"
-                >
+                <TabsContent value="details" className="space-y-4 md:space-y-6 pb-6">
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2 text-sm md:text-base">
                       Description
@@ -294,9 +314,7 @@ export default function AllIssues(
                     </h3>
                     <div className="flex items-center text-gray-700 text-sm md:text-base">
                       <MapPin className="w-4 h-4 mr-2 text-red-500 flex-shrink-0" />
-                      <span className="break-words">
-                        {selectedIssue?.location}
-                      </span>
+                      <span className="break-words">{selectedIssue?.location}</span>
                     </div>
                   </div>
 
@@ -307,127 +325,58 @@ export default function AllIssues(
                       </h3>
                       <div className="flex items-center text-gray-700 text-sm md:text-base">
                         <User className="w-4 h-4 mr-2 text-blue-500 flex-shrink-0" />
-                        <span className="truncate">
-                          {selectedIssue.assignedTo.name}
-                        </span>
+                        <span className="truncate">{selectedIssue.assignedTo.name}</span>
                       </div>
                     </div>
                   )}
-
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2 text-sm md:text-base">
-                      Upvotes
-                    </h3>
-                    <div className="flex items-center">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex items-center space-x-2 text-xs md:text-sm"
-                      >
-                        <ThumbsUp className="w-4 h-4" />
-                        <span className="font-semibold">
-                          {selectedIssue?.upvotes?.length || 0} support
-                        </span>
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Timeline for Mobile - Show here on small screens */}
-                  <div className="lg:hidden mt-6 pt-6 border-t">
-                    <h3 className="font-bold text-lg text-gray-900 mb-4 flex items-center">
-                      <Clock className="w-5 h-5 mr-2 text-blue-600" />
-                      Timeline
-                    </h3>
-                    <div className="space-y-4 relative before:absolute before:left-4 before:top-0 before:bottom-0 before:w-0.5 before:bg-gray-300 pb-4">
-                      {selectedIssue?.timeline.map((t, index) => (
-                        <div key={t._id} className="relative pl-10">
-                          <div
-                            className={`absolute left-0 w-8 h-8 rounded-full flex items-center justify-center ${getStatusColor(
-                              t.status
-                            )} border-4 border-white shadow-md`}
-                          >
-                            {getStatusIcon(t.status)}
-                          </div>
-                          <div className="bg-white rounded-lg p-3 shadow-sm border hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                              <span
-                                className={`font-semibold text-xs px-2 py-1 rounded ${getStatusColor(
-                                  t.status
-                                )}`}
-                              >
-                                {t.status.toUpperCase()}
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-600 mb-1 truncate">
-                              By: {t.by?.name || "System"}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {new Date(t.date).toLocaleDateString()} at{" "}
-                              {new Date(t.date).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </TabsContent>
 
-                <TabsContent
-                  value="opinions"
-                  className="space-y-3 md:space-y-4 pb-6"
-                >
+                <TabsContent value="opinions" className="space-y-3 md:space-y-4 pb-6">
                   {selectedIssue?.opinions.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <p className="text-sm md:text-base">No opinions yet</p>
                     </div>
                   ) : (
-                    <div className="space-y-3 md:space-y-4">
-                      {selectedIssue?.opinions.map((op) => (
-                        <div
-                          key={op._id}
-                          className="border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center flex-1 min-w-0">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold mr-3 flex-shrink-0">
-                                {(op.user?.name || "A")[0].toUpperCase()}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="font-semibold text-sm text-gray-900 truncate">
-                                  {op.user?.name || "Anonymous"}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {new Date(op.date).toLocaleDateString()}
-                                  <span className="hidden sm:inline">
-                                    {" "}
-                                    at{" "}
-                                    {new Date(op.date).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
-                                  </span>
-                                </p>
-                              </div>
+                    selectedIssue?.opinions.map((op) => (
+                      <div
+                        key={op._id}
+                        className="border rounded-lg p-3 md:p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center flex-1 min-w-0">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold mr-3 flex-shrink-0">
+                              {(op.user?.name || "A")[0].toUpperCase()}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-sm text-gray-900 truncate">
+                                {op.user?.name || "Anonymous"}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(op.date).toLocaleDateString()}
+                                <span className="hidden sm:inline">
+                                  {" "}
+                                  at{" "}
+                                  {new Date(op.date).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                              </p>
                             </div>
                           </div>
-                          <p className="text-gray-700 text-sm ml-0 sm:ml-11 break-words">
-                            {op.comment}
-                          </p>
                         </div>
-                      ))}
-                    </div>
+                        <p className="text-gray-700 text-sm ml-0 sm:ml-11 break-words">
+                          {op.comment}
+                        </p>
+                      </div>
+                    ))
                   )}
                 </TabsContent>
 
                 <TabsContent value="images" className="space-y-4 pb-6">
                   {selectedIssue?.images.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
-                      <p className="text-sm md:text-base">
-                        No images available
-                      </p>
+                      <p className="text-sm md:text-base">No images available</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
@@ -449,14 +398,14 @@ export default function AllIssues(
               </Tabs>
             </div>
 
-            {/* Right Side - Timeline (Desktop Only) */}
+            {/* Right Side Timeline */}
             <div className="hidden lg:block bg-gradient-to-br from-gray-50 to-gray-100 border-l p-6 overflow-y-auto">
               <h3 className="font-bold text-lg text-gray-900 mb-6 flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-blue-600" />
                 Timeline
               </h3>
               <div className="space-y-4 relative before:absolute before:left-4 before:top-0 before:bottom-0 before:w-0.5 before:bg-gray-300">
-                {selectedIssue?.timeline.map((t, index) => (
+                {selectedIssue?.timeline.map((t) => (
                   <div key={t._id} className="relative pl-10">
                     <div
                       className={`absolute left-0 w-8 h-8 rounded-full flex items-center justify-center ${getStatusColor(
