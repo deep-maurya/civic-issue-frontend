@@ -170,10 +170,6 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, isLoading, theme = 'light
   }, [getUserLocation])
 
   const handleMarkerClick = (issue: CivicIssue) => {
-    if (!isLoggedIn) {
-      setShowLoginPrompt(true);
-      return;
-    }
     setSelectedIssue(issue)
     setIsDialogOpen(true)
   }
