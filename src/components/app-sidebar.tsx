@@ -62,7 +62,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Base nav items with actual routes
   const navMainBase: NavItem[] = [
     { title: 'Dashboard', url: '/dashboard', icon: IconDashboard },
-    { title: 'All Issues', url: '/dashboard/issues', icon: IconListDetails }
   ];
 
   // Role-based filtering
