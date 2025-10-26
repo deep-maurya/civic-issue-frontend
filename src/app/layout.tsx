@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 import ReactQueryProvider from '@/context/ReactQuery.provider';
 import { Toaster } from '@/components/ui/sonner';
+import ReduxProvider from '@/redux/ReduxProvider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -42,10 +43,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${spaceGrotesk.variable} antialiased`}
       >
+
           <ReactQueryProvider>
             <ThemeProvider>
+            <ReduxProvider>
               {children}
               <Toaster position="top-right" richColors />
+              </ReduxProvider>
             </ThemeProvider>
           </ReactQueryProvider>
       </body>

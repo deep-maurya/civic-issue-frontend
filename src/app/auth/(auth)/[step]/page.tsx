@@ -12,7 +12,6 @@ export default async function AuthStepPage({ params }: AuthStepPageProps) {
 
   if (step === 'login') return <LoginForm />;
   if (step === 'forgot-password') return <ForgotPassword />;
-  // if (step === 'otp') return <OtpForm />;
   if (step === 'signup') return <RegisterForm />;
 
   return notFound();

@@ -6,16 +6,16 @@ import { AppDispatch, RootState } from '@/redux/store';
 export function useAuthSelector() {
   return useSelector((state: RootState) => ({
     user: state.auth.user,
-    token: state.auth.token,
-    isLoggedIn: !!state.auth.token,
+    role :state.auth.role,
+    isLoggedIn: state.auth.isLoggedIn,
   }));
 }
 
 export function useAuthActions() {
   const dispatch = useDispatch<AppDispatch>();
   return {
-    setCredentials: (user: any, token: string) =>
-      dispatch(setCredentials({ user, token })),
+    setCredentials: (user: any, role: "USER" | "ADMIN" | "WORKER", isLoggedIn:Boolean) =>
+      dispatch(setCredentials({ user, role, isLoggedIn })),
     clearCredentials: () => dispatch(logout()),
   };
 }
