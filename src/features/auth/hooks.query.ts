@@ -25,9 +25,14 @@ const useLoginMutation = () => {
     },
     onSuccess: (res) => {
       if (res.user) {
-        setCredentials(res.user, "USER", true);
+        const role = res.user.role==='admin' ? 'ADMIN' : res.user.role==='worker' ? 'WORKER' : 'USER';
+        setCredentials(res.user, role, true);
         toast.success('Login Successful');
-        router.push('/dashboard');
+        if(role==="ADMIN"){
+          router.push('/dashboard');
+        } else {
+          router.push('/');
+        }
       } else {
         throw new Error('Login failed');
       }

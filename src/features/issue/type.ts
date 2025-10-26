@@ -4,6 +4,16 @@ export type upvoteIssue = {
     issue_id: string
   };
 
+  export type updateStatus = {
+    issue_id: string,
+    status : string
+  }
+
+  export type assignIssue = {
+    issue_id: string,
+    user_id : string
+  }
+
 
   export interface Issue {
     _id: string

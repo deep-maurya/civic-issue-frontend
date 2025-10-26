@@ -21,6 +21,9 @@ import {
   Cross,
   MapPin,
 } from 'lucide-react'
+import IssueModal from './IssueModal'
+import { useAuthSelector } from '@/features/auth/hooks.redux'
+import { Issue } from '@/features/issue/type'
 
 // Types
 export interface CivicIssue {
@@ -45,6 +48,7 @@ export interface CivicIssue {
 interface IssuesMapProps {
   issues: CivicIssue[]
   theme?: 'light' | 'dark'
+  isLoading: boolean
 }
 
 const mapContainerStyle = { width: '100%', height: '600px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }
@@ -134,11 +138,13 @@ const getLucideIconSVG = (type: string) => {
   return iconSVGs[type] || iconSVGs.Garbage
 }
 
-const IssuesMap: React.FC<IssuesMapProps> = ({ issues, theme = 'light' }) => {
+const IssuesMap: React.FC<IssuesMapProps> = ({ issues, isLoading, theme = 'light' }) => {
   const [selectedIssue, setSelectedIssue] = useState<CivicIssue | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [mapCenter, setMapCenter] = useState(defaultCenter)
+  const [showLoginPrompt,setShowLoginPrompt] = useState(false);
+  const { isLoggedIn } = useAuthSelector();
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
@@ -164,6 +170,10 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, theme = 'light' }) => {
   }, [getUserLocation])
 
   const handleMarkerClick = (issue: CivicIssue) => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setSelectedIssue(issue)
     setIsDialogOpen(true)
   }
@@ -189,9 +199,9 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, theme = 'light' }) => {
           styles: mapStyles[theme],
         }}
       >
-        {issues.map((issue) => (
+        {!isLoading && issues.map((issue) => (
           <Marker
-            key={issue.id}
+            key={issue?.description}
             position={{ lat: issue.lat, lng: issue.lng }}
             icon={createCustomPinMarker(issue.type, issue.status)}
             onClick={() => handleMarkerClick(issue)}
@@ -201,69 +211,13 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, theme = 'light' }) => {
         ))}
       </GoogleMap>
 
-      {/* Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="pb-6">
-            <div className="flex items-center gap-6">
-              <div
-                className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-xl ${
-                  selectedIssue?.status === 'Reported'
-                    ? 'bg-gradient-to-br from-red-400 to-red-600'
-                    : selectedIssue?.status === 'In Progress'
-                    ? 'bg-gradient-to-br from-orange-400 to-orange-600'
-                    : selectedIssue?.status === 'Resolved'
-                    ? 'bg-gradient-to-br from-green-400 to-green-600'
-                    : 'bg-gradient-to-br from-blue-400 to-blue-600'
-                }`}
-              >
-                {selectedIssue && React.createElement(getLucideIcon(selectedIssue.type), { className: 'w-10 h-10 text-white' })}
-              </div>
-              <div>
-                <DialogTitle className="text-3xl font-bold">{selectedIssue?.type}</DialogTitle>
-                <DialogDescription>{selectedIssue?.type === 'User Location' ? 'Your Current Location' : 'Civic Issue Report'}</DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-          {selectedIssue && (
-            <div className="space-y-8">
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-4 h-4 rounded-full ${
-                      selectedIssue.status === 'Reported'
-                        ? 'bg-red-500'
-                        : selectedIssue.status === 'In Progress'
-                        ? 'bg-orange-500'
-                        : selectedIssue.status === 'Resolved'
-                        ? 'bg-green-500'
-                        : 'bg-blue-500'
-                    }`}
-                  ></div>
-                  <span className="text-lg font-semibold">Current Status</span>
-                </div>
-                <span
-                  className={`px-6 py-3 rounded-2xl text-lg font-bold shadow-lg ${
-                    selectedIssue.status === 'Reported'
-                      ? 'bg-red-100 text-red-800 border-2 border-red-200'
-                      : selectedIssue.status === 'In Progress'
-                      ? 'bg-orange-100 text-orange-800 border-2 border-orange-200'
-                      : selectedIssue.status === 'Resolved'
-                      ? 'bg-green-100 text-green-800 border-2 border-green-200'
-                      : 'bg-blue-100 text-blue-800 border-2 border-blue-200'
-                  }`}
-                >
-                  {selectedIssue.status}
-                </span>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
-                <h4 className="text-xl font-bold mb-2">Description</h4>
-                <p className="text-gray-700 dark:text-gray-300">{selectedIssue.description}</p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <IssueModal
+        selectedIssue={selectedIssue as unknown as any}
+        isModalOpen={isDialogOpen}
+        setIsModalOpen={setIsDialogOpen}
+        showLoginPrompt={showLoginPrompt}
+        setShowLoginPrompt={setShowLoginPrompt}
+      />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { useAuthSelector } from "@/features/auth/hooks.redux";
 import { useRouter } from "next/navigation";
+import { authMutations } from "@/features/auth/hooks.query";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,7 +27,10 @@ const Navbar = () => {
     setIsMenuOpen(false);
     router.push(path);
   };
+  const { mutate: logout } = authMutations.logout();
 
+
+  
   return (
     <>
       <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/50">
@@ -59,14 +63,6 @@ const Navbar = () => {
               >
                 How It Works
               </a>
-
-              <a
-                href="#report"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all bg-gradient-to-br from-primary to-primary/70 text-primary-foreground hover:from-primary/90 hover:to-primary/80"
-              >
-                <Zap className="w-4 h-4" />
-                Report Issue
-              </a>
             </div>
 
             {/* Right Controls */}
@@ -93,10 +89,10 @@ const Navbar = () => {
                 {isLoggedIn && (
                   <Button
                     size="lg"
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => logout()}
                     variant="secondary"
                   >
-                    Dashboard
+                    Logout
                   </Button>
                 )}
               </div>
@@ -160,9 +156,9 @@ const Navbar = () => {
               ) : (
                 <Button
                   variant="secondary"
-                  onClick={() => handleNavigation("/dashboard")}
+                  onClick={() => logout()}
                 >
-                  Dashboard
+                  Logout
                 </Button>
               )}
               
