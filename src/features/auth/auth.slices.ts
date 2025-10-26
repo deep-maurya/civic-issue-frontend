@@ -2,12 +2,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface AuthState {
   user: any | null;
-  token: string | null;
+  isLoggedIn: Boolean,
+  role: "USER" | "ADMIN" | "WORKER"
 }
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  isLoggedIn: false,
+  role:"USER"
 };
 
 const authSlice = createSlice({
@@ -16,14 +18,15 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: any; token: string }>
+      action: PayloadAction<AuthState>
     ) => {
       state.user = action.payload.user;
-      state.token = action.payload.token;
+      state.isLoggedIn = action.payload.isLoggedIn
+      state.role = action.payload.role;
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
+      state.isLoggedIn = false;
     },
   },
 });

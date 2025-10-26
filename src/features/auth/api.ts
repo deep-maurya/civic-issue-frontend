@@ -6,7 +6,6 @@ import {
 } from '@/features/auth/type';
 
 const login = async (LoginCredentials: LoginCredentials) => {
-  await new Promise((resolve) => setTimeout(resolve, 4000));
   try {
     const response = await api.post<LoginResponse>('/users/login', {
       email: LoginCredentials.email,
@@ -29,7 +28,7 @@ const register = async (data: registrationRequest) => {
 
 const logout = async () => {
   try {
-    const response = await api.post('/auth/logout');
+    const response = await api.post('/users/logout');
     return response.data;
   } catch (error) {
     throw error;
