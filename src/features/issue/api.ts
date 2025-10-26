@@ -1,5 +1,5 @@
 import api from '@/config/axios.config';
-import { GetAllIssueResponse, upvoteIssue, upvoteResponse } from './type';
+import { GetAllIssueResponse, ReportIssuePayload, ReportIssueResponse, upvoteIssue, upvoteResponse } from './type';
 
 export const issueUpvote = async (upvoteIssue: upvoteIssue) => {
     try {
@@ -18,3 +18,27 @@ export const getAllIssue = async () => {
         throw error;
     }
 }
+
+export const reportIssue = async (payload: ReportIssuePayload): Promise<any> => {
+  try {
+    const formData = new FormData(); 
+    formData.append('title', payload.issueType);
+    formData.append('description', payload.description);
+    formData.append('location', payload.address);
+    formData.append('longitude', payload.longitude);
+    formData.append('latitude', payload.latitude);
+    if (payload.photo) {
+      formData.append('images', payload.photo);
+    }
+
+    const response = await api.post<ReportIssueResponse>('/issues', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -30,5 +30,19 @@ export type upvoteIssue = {
   }
   
 export type GetAllIssueResponse = ApiResponse<Issue[]>
+export type ReportIssuePayload = {
+  issueType: string;
+  description: string;
+  address: string;
+  photo?: File | null;
+  latitude: Number,
+  longitude:Number
+};
+
+export type ReportIssueResponse = {
+  success: boolean;
+  message: string;
+  data: Issue;
+};
   
 export type upvoteResponse = ApiResponse<{status : String}>;
