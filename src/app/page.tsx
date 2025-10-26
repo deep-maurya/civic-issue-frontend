@@ -18,13 +18,14 @@ import {
 import Navbar from "@/components/PublicPages/Navbar";
 import Footer from "@/components/PublicPages/Footer";
 import { Button } from "@/components/ui/button";
-import IssuesMap from "@/components/IssuesMap";
+import IssuesMap from "@/components/Issues/IssuesMap";
 import { useTheme } from "next-themes";
 import { ThemeContext } from "@/context/ThemeContext";
 import AllIssues from "@/components/Issues/AllIssues";
 import { useAuthSelector } from "@/features/auth/hooks.redux";
 import { useGetAllIssues } from "@/features/issue/hooks.query";
 import ReportIssueModal from "@/components/Issues/ReportIssueModal";
+import LoginSignupModal from "@/components/common/LoginSignupModal";
 
 export interface CivicIssue {
   id: number;
@@ -212,6 +213,8 @@ const CivicIssueLanding = () => {
   const { isLoggedIn } = useAuthSelector();
   const [isOpen, setIsOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { data: issues, isLoading, isFetched, refetch } = useGetAllIssues()
   const features = [
     {
       icon: <Camera className="w-5 h-5" />,
@@ -310,7 +313,13 @@ const CivicIssueLanding = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Button
-              onClick={() => setIsOpen(true)}
+              onClick={() => {
+                if (isLoggedIn) {
+                  setIsOpen(true);
+                } else {
+                  setShowLoginModal(true);
+                }
+              }}
               className="bg-gradient-to-br from-primary to-primary/70 hover:from-primary/90 hover:to-primary/80 text-primary-foreground px-6 py-3 rounded-lg text-base font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center"
             >
               Report issue now
@@ -362,7 +371,7 @@ const CivicIssueLanding = () => {
 
         {/* Map */}
         <div className="max-w-7xl mx-auto mb-10">
-          <IssuesMap issues={civicIssues} theme={themeContext?.theme} />
+          <IssuesMap issues={issues?.data as any[]} isLoading={isLoading} theme={themeContext?.theme} />
         </div>
 
         <div className="text-center max-w-3xl mx-auto mb-16 pt-10">
@@ -377,7 +386,7 @@ const CivicIssueLanding = () => {
 
         {/* All Issues Cards - Full Width */}
         <div className=" w-full">
-          <AllIssues />
+          <AllIssues issues={issues?.data as any[]} isLoading={isLoading} isFetched={isFetched} refetch={()=>refetch().then(()=>{})}  />
         </div>
       </section>
 
@@ -487,17 +496,25 @@ const CivicIssueLanding = () => {
             their communities.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              onClick={() => setIsOpen(true)}
-              className="bg-background text-foreground px-6 py-3 rounded-lg text-base font-semibold hover:bg-accent transition-all duration-300 text-center"
-            >
-              Report an Issue
-            </Button>
+          <Button
+            onClick={() => {
+              if (isLoggedIn) {
+                setIsOpen(true);
+              } else {
+                setShowLoginModal(true);
+              }
+            }}
+            className="bg-background text-foreground px-6 py-3 rounded-lg text-base font-semibold hover:bg-accent transition-all duration-300 text-center"
+          >
+            Report an Issue
+          </Button>
+
           </div>
         </div>
       </section>
 
       <ReportIssueModal open={isOpen} onOpenChange={setIsOpen} />
+      <LoginSignupModal open={showLoginModal} onOpenChange={setShowLoginModal} />
       <Footer />
     </div>
   );

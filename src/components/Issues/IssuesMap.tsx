@@ -45,6 +45,7 @@ export interface CivicIssue {
 interface IssuesMapProps {
   issues: CivicIssue[]
   theme?: 'light' | 'dark'
+  isLoading: boolean
 }
 
 const mapContainerStyle = { width: '100%', height: '600px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }
@@ -134,7 +135,7 @@ const getLucideIconSVG = (type: string) => {
   return iconSVGs[type] || iconSVGs.Garbage
 }
 
-const IssuesMap: React.FC<IssuesMapProps> = ({ issues, theme = 'light' }) => {
+const IssuesMap: React.FC<IssuesMapProps> = ({ issues, isLoading, theme = 'light' }) => {
   const [selectedIssue, setSelectedIssue] = useState<CivicIssue | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -189,9 +190,9 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, theme = 'light' }) => {
           styles: mapStyles[theme],
         }}
       >
-        {issues.map((issue) => (
+        {!isLoading && issues.map((issue) => (
           <Marker
-            key={issue.id}
+            key={issue?.description}
             position={{ lat: issue.lat, lng: issue.lng }}
             icon={createCustomPinMarker(issue.type, issue.status)}
             onClick={() => handleMarkerClick(issue)}
