@@ -306,7 +306,12 @@ const ReportIssueModal: React.FC<ReportIssueModalProps> = ({
       </Dialog>
 
       {/* Success Modal */}
-      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+      <Dialog open={showSuccessModal} onOpenChange={(open) => {
+        setShowSuccessModal(open);
+        if (!open) {
+          onOpenChange(false); // Close the main report modal when success modal is closed
+        }
+      }}>
         <DialogContent className="sm:max-w-md w-[90vw] text-center space-y-6 p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
             <CheckCircle className="w-12 h-12 text-green-600" />
@@ -315,7 +320,10 @@ const ReportIssueModal: React.FC<ReportIssueModalProps> = ({
               Your issue has been submitted to <span className="font-semibold text-gray-900">Civic</span>. 
               Our team will review it and take appropriate action. Thank you for helping improve your community!
             </DialogDescription>
-            <Button variant="default" className="w-full mt-2" onClick={() => setShowSuccessModal(false)}>
+            <Button variant="default" className="w-full mt-2" onClick={() => {
+              setShowSuccessModal(false);
+              onOpenChange(false);
+            }}>
               OK
             </Button>
           </div>
