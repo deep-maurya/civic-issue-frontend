@@ -374,7 +374,7 @@ const CivicIssueLanding = () => {
           <IssuesMap issues={issues?.data as any[]} isLoading={isLoading} theme={themeContext?.theme} />
         </div>
 
-        <div className="text-center max-w-3xl mx-auto mb-16 pt-10">
+        <div id="recent-issues" className="text-center max-w-3xl mx-auto mb-16 mt-[80px]">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
             Recent Issues Reported by Community
           </h2>
@@ -385,7 +385,7 @@ const CivicIssueLanding = () => {
 
 
         {/* All Issues Cards - Full Width */}
-        <div className=" w-full">
+        <div  className=" w-full">
           <AllIssues issues={issues?.data as any[]} isLoading={isLoading} isFetched={isFetched} refetch={()=>refetch().then(()=>{})}  />
         </div>
       </section>

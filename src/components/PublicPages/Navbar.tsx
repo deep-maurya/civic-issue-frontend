@@ -63,6 +63,12 @@ const Navbar = () => {
               >
                 How It Works
               </a>
+              <a
+                href="#recent-issues"
+                className="text-foreground/70 hover:text-foreground transition-colors font-medium"
+              >
+                Reported Issues
+              </a>
             </div>
 
             {/* Right Controls */}
