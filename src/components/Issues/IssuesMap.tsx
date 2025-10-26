@@ -187,7 +187,7 @@ const IssuesMap: React.FC<IssuesMapProps> = ({ issues, isLoading, theme = 'light
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={mapCenter}
-        zoom={userLocation ? 12 : 10}
+        zoom={userLocation ? 5 : 5}
         options={{
           streetViewControl: false,
           mapTypeControl: false,
