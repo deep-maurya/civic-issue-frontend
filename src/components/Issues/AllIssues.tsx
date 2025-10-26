@@ -102,8 +102,19 @@ const getStatusIcon = (status: string) => {
  
   
 
-export default function AllIssues() {
-const { data: issues, isLoading, isFetched, refetch } = useGetAllIssues()
+export default function AllIssues(
+    {
+        issues,
+        isLoading,
+        isFetched,
+        refetch
+    }: {
+        issues: any[],
+        isLoading: boolean,
+        isFetched: boolean,
+        refetch: () => Promise<void>
+    }
+) {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [upvoting, setIsupvoting] = useState(false);
@@ -118,7 +129,7 @@ const { data: issues, isLoading, isFetched, refetch } = useGetAllIssues()
     setIsupvoting(true);
     try {
       const response = await issueUpvote({issue_id:issueId});
-      refetch().then(()=>{
+      await refetch().then(()=>{
         setIsupvoting(false);
       });
       return response
@@ -131,7 +142,7 @@ const { data: issues, isLoading, isFetched, refetch } = useGetAllIssues()
   return (
 <div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {isFetched && (issues?.data as any[]).map((issue)  => (
+          {isFetched && issues.map((issue)  => (
             <div
               key={issue._id}
               className="bg-background border border-border/50 rounded-xl hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 cursor-pointer"
