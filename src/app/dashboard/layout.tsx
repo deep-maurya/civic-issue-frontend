@@ -1,13 +1,10 @@
 import ProtectedLayout from '@/components/common/Protected-route';
-import ReduxProvider from '@/redux/ReduxProvider';
 import React from 'react';
 
 const layout = ({ children }: { children: React.ReactNode }) => {
-  return <ReduxProvider>
-        <ProtectedLayout>
+  return <ProtectedLayout>
           {children}
-        </ProtectedLayout>
-      </ReduxProvider>;
+        </ProtectedLayout>;
 };
 
 export default layout;

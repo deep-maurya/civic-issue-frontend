@@ -23,6 +23,8 @@ import IssuesMap from "@/components/IssuesMap";
 import { useTheme } from "next-themes";
 import { ThemeContext } from "@/context/ThemeContext";
 import AllIssues from "@/components/Issues/AllIssues";
+import { useAuthSelector } from "@/features/auth/hooks.redux";
+import { useGetAllIssues } from "@/features/issue/hooks.query";
 
 export interface CivicIssue {
   id: number;
@@ -207,6 +209,7 @@ const civicIssues: CivicIssue[] = [
 ];
 
 const CivicIssueLanding = () => {
+  const { isLoggedIn } = useAuthSelector();
   const [isOpen, setIsOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
   const features = [

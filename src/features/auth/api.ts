@@ -6,7 +6,6 @@ import {
 } from '@/features/auth/type';
 
 const login = async (LoginCredentials: LoginCredentials) => {
-  await new Promise((resolve) => setTimeout(resolve, 4000));
   try {
     const response = await api.post<LoginResponse>('/users/login', {
       email: LoginCredentials.email,
