@@ -18,15 +18,14 @@ const useLoginMutation = () => {
   return useMutation<LoginResponse, any, LoginCredentials>({
     mutationFn: async (credentials) => {
       const res = await authApi.login(credentials);
-      if (!res.success || !res.data) {
+      if (res.status!=='success' || !res.user) {
         throw res.message || 'Login failed';
       }
       return res;
     },
     onSuccess: (res) => {
-      if (res.data) {
-        localStorage.setItem('accessToken', res.data.token);
-        setCredentials(res.data.user, res.data.token);
+      if (res.user) {
+        setCredentials(res.user, "USER", true);
         toast.success('Login Successful');
         router.push('/dashboard');
       } else {
@@ -45,7 +44,7 @@ const useRegistrationMutation = () => {
   return useMutation<RegistrationResponse, any, registrationRequest>({
     mutationFn: async (data) => {
       const res = await authApi.register(data);
-      if (!res.success || !res.data) {
+      if (res.status!=='success' || !res.user) {
         throw res.message || 'Registration failed';
       }
       return res;

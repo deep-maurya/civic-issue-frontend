@@ -17,12 +17,14 @@ import {
 
 import Navbar from "@/components/PublicPages/Navbar";
 import Footer from "@/components/PublicPages/Footer";
-import ReportIssueModal from "@/components/ReportIssueModal";
 import { Button } from "@/components/ui/button";
 import IssuesMap from "@/components/IssuesMap";
 import { useTheme } from "next-themes";
 import { ThemeContext } from "@/context/ThemeContext";
 import AllIssues from "@/components/Issues/AllIssues";
+import { useAuthSelector } from "@/features/auth/hooks.redux";
+import { useGetAllIssues } from "@/features/issue/hooks.query";
+import ReportIssueModal from "@/components/Issues/ReportIssueModal";
 
 export interface CivicIssue {
   id: number;
@@ -207,6 +209,7 @@ const civicIssues: CivicIssue[] = [
 ];
 
 const CivicIssueLanding = () => {
+  const { isLoggedIn } = useAuthSelector();
   const [isOpen, setIsOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
   const features = [
@@ -358,7 +361,7 @@ const CivicIssueLanding = () => {
         </div>
 
         {/* Map */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+        <div className="max-w-7xl mx-auto mb-10">
           <IssuesMap issues={civicIssues} theme={themeContext?.theme} />
         </div>
 

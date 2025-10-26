@@ -26,6 +26,9 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import { issueUpvote } from "@/features/issue/api";
+import { useGetAllIssues } from "@/features/issue/hooks.query";
+import { useAuthSelector } from "@/features/auth/hooks.redux";
 
 interface User {
   _id: string;
@@ -62,73 +65,6 @@ interface Issue {
   createdAt: string;
 }
 
-const issues = [
-    {
-        "_id": "68fd3d9b9c5022202ef0a517",
-        "title": "Pothole on Main Street",
-        "description": "Large pothole causing traffic issues near the central park.",
-        "location": "Main Street, Downtown",
-        "images": [
-            "https://res.cloudinary.com/dnxcz7avf/image/upload/v1761426842/civic-issues/tc6bkexrdk4hgqbotf23.png"
-        ],
-        "reportedBy": {
-            "_id": "68fca36c40ea900c68992f3c",
-            "name": "Deepak maurya",
-            "email": "Deepakmauryahd2@gmail.com"
-        },
-        "upvotes": [],
-        "timeline": [
-            {
-                "status": "reported",
-                "by": {
-                    "_id": "68fca36c40ea900c68992f3c",
-                    "name": "Deepak maurya",
-                    "email": "Deepakmauryahd2@gmail.com"
-                },
-                "date": "2025-10-25T21:14:03.050Z",
-                "_id": "68fd3d9b9c5022202ef0a518"
-            }
-        ],
-        "status": "pending",
-        "opinions": [],
-        "createdAt": "2025-10-25T21:14:03.073Z",
-        "updatedAt": "2025-10-25T21:14:03.073Z",
-        "__v": 0
-    },
-    {
-        "_id": "68fd3db79c5022202ef0a522",
-        "title": "Pothole on Main Street mumbai",
-        "description": "Large pothole causing traffic issues near the central park.",
-        "location": "Main Street, Downtown",
-        "images": [
-            "https://res.cloudinary.com/dnxcz7avf/image/upload/v1761426870/civic-issues/bl9zhdzt9dhm4sxhv97j.png"
-        ],
-        "reportedBy": {
-            "_id": "68fca36c40ea900c68992f3c",
-            "name": "Deepak maurya",
-            "email": "Deepakmauryahd2@gmail.com"
-        },
-        "upvotes": [],
-        "timeline": [
-            {
-                "status": "reported",
-                "by": {
-                    "_id": "68fca36c40ea900c68992f3c",
-                    "name": "Deepak maurya",
-                    "email": "Deepakmauryahd2@gmail.com"
-                },
-                "date": "2025-10-25T21:14:31.798Z",
-                "_id": "68fd3db79c5022202ef0a523"
-            }
-        ],
-        "status": "pending",
-        "opinions": [],
-        "createdAt": "2025-10-25T21:14:31.803Z",
-        "updatedAt": "2025-10-25T21:14:31.803Z",
-        "__v": 0
-    }
-];
-
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
     case "pending":
@@ -161,19 +97,41 @@ const getStatusIcon = (status: string) => {
   }
 };
 
+
+
+ 
+  
+
 export default function AllIssues() {
+const { data: issues, isLoading, isFetched, refetch } = useGetAllIssues()
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [upvoting, setIsupvoting] = useState(false);
+  const { isLoggedIn } = useAuthSelector();
 
   const openModal = (issue: Issue) => {
     setSelectedIssue(issue);
     setIsModalOpen(true);
   };
 
+  const handleUpvote = async (issueId: string) => {
+    setIsupvoting(true);
+    try {
+      const response = await issueUpvote({issue_id:issueId});
+      refetch().then(()=>{
+        setIsupvoting(false);
+      });
+      return response
+    } catch (error: any) {
+      console.error('Upvote failed', error)
+      throw error
+    }
+  }
+
   return (
 <div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {issues.map((issue) => (
+          {isFetched && (issues?.data as any[]).map((issue)  => (
             <div
               key={issue._id}
               className="bg-background border border-border/50 rounded-xl hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 cursor-pointer"
@@ -223,20 +181,26 @@ export default function AllIssues() {
 
               {/* Upvote Button & Date */}
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                <button
-                  className={`flex items-center space-x-1 px-2 py-1 rounded-md border ${
+              <Button
+                disabled={upvoting}
+                className={`flex items-center space-x-1 px-2 py-1 rounded-md border cursor-pointer ${
                     true
-                      ? "bg-primary text-white border-primary"
-                      : "border-border/50 text-primary hover:bg-primary/10"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // handleUpvote(issue._id);
-                  }}
+                    ? "bg-primary text-white border-primary"
+                    : "border-border/50 text-primary hover:bg-primary/10"
+                }`}
+                onClick={(e) => {
+                    if(isLoggedIn){
+                        e.stopPropagation()
+                        handleUpvote(issue._id)
+                    } else {
+                        alert("Please login to upvote")
+                    }
+                }}
                 >
-                  <ThumbsUp className="w-4 h-4" />
-                  <span>{issue.upvotes?.length || 0}</span>
-                </button>
+                <ThumbsUp className="w-4 h-4" />
+                <span>{issue.upvotes?.length || 0}</span>
+                </Button>
+
 
                 <div className="flex items-center space-x-1 text-xs">
                   <Calendar className="w-3 h-3" />
