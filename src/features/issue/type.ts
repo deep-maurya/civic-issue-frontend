@@ -24,7 +24,11 @@ export type upvoteIssue = {
       lng: number
     }
     images: string[]
-    upvotes: number
+    upvotes: {
+      _id: string
+      name: string
+      profilePicture: string
+    }[]
     status: string
     timeline: {
       status: string

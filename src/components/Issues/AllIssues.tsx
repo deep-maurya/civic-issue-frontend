@@ -9,6 +9,8 @@ import {
   User,
   CheckCircle2,
   Clock,
+  ArrowRight,
+  ExternalLink,
 } from "lucide-react";
 import { issueUpvote } from "@/features/issue/api";
 import { useAuthSelector } from "@/features/auth/hooks.redux";
@@ -21,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import IssueModal from "./IssueModal";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -104,7 +107,7 @@ export default function AllIssues({
   const [upvoting, setIsUpvoting] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const { isLoggedIn } = useAuthSelector();
-
+  const router = useRouter();
   const openModal = (issue: Issue) => {
     setSelectedIssue(issue);
     setIsModalOpen(true);
@@ -194,12 +197,13 @@ export default function AllIssues({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
+                            size={"sm"}
                             disabled={upvoting}
                             onClick={(e) => {
                               e.preventDefault();
                               handleUpvote(issue._id);
                             }}
-                            className={`flex items-center space-x-1 px-2 py-1 rounded-md border ${
+                            className={`flex items-center space-x-1 py-1 rounded-md border ${
                               isLoggedIn
                                 ? "bg-primary text-white border-primary"
                                 : "bg-gray-200 text-gray-600 border-gray-300 cursor-not-allowed"
@@ -226,6 +230,14 @@ export default function AllIssues({
                         {new Date(issue.createdAt).toLocaleDateString()}
                       </span>
                     </div>
+
+                  </div>
+                  <div className="flex items-center space-x-1 text-xs border-t pt-2 mt-2">
+                    <Button onClick={()=>{
+                    router.push(`/issues/${issue._id}`);
+                    }} size="sm" variant="outline" className="flex items-center space-x-1 w-full">
+                      View <ExternalLink className="w-3 h-3" />
+                    </Button>
                   </div>
                 </div>
               </div>
